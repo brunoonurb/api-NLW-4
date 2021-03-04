@@ -1,6 +1,6 @@
-import { Request, Response } from 'express'
-import { getRepository } from 'typeorm';
-import { User } from '../models/User';
+import { Request, Response } from 'express';
+import { getCustomRepository } from 'typeorm';
+import { UsersRepository } from '../repositories/UsersRepository';
 
 class UserController {
 
@@ -8,20 +8,37 @@ class UserController {
 
         const { name, email } = request.body;
 
-        const usersRepository = getRepository(User)
+        try {
+            const usersRepository = getCustomRepository(UsersRepository)
 
-        const user = usersRepository.create({
-            name, email
-        })
+            const userAlreadyExists = await usersRepository.findOne({
+                email
+            })
+            if (userAlreadyExists) {
+                return response.status(400).json({
+                    error: 'user already exists!',
+                    message: 'Usário já existe!'
+                })
+            }
 
-        console.log(user);
-        
-        await usersRepository.save(user)
+            const user = usersRepository.create({
+                name, email
+            })
 
-        return response.json({
-            message: 'Cadastro com Sucesso',
-            user
-        })
+            console.log(user);
+
+            await usersRepository.save(user)
+
+            return response.status(201).json({
+                message: 'Cadastro com Sucesso',
+                user
+            })
+        } catch (error) {
+            return response.json({
+                message: 'Erro na operação',
+                error
+            })
+        }
     }
 }
 
