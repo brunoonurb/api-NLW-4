@@ -24,7 +24,8 @@ class SurveyController {
             })
         } catch (error) {
             return response.status(500).json({
-                message: 'Erro na operação!'
+                message: 'Erro na operação!',
+                error
             })
         }
     }
@@ -41,7 +42,8 @@ class SurveyController {
 
         } catch (error) {
             return response.status(500).json({
-                message: 'Erro na operação!'
+                message: 'Erro na operação!',
+                error
             })
         }
     }
