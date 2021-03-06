@@ -1,4 +1,5 @@
 import request from 'supertest'
+import { getConnection } from 'typeorm';
 import { app } from '../app';
 
 import createConnection from '../database'
@@ -8,6 +9,12 @@ describe("Users", () => {
         const connection = await createConnection();
         await connection.runMigrations();
     })
+
+    afterAll(async () => {
+      const connection = getConnection();
+      await connection.dropDatabase();
+      await connection.close();
+    });
 
     it("should be able to create new user", async () => {
         const response = await request(app).post('/users')
@@ -37,4 +44,4 @@ describe("Users", () => {
 
     // it("Deve ser possicel somar 2 numero", ()=>{
     //     expect(2 + 2).not.toBe(5);
-    // }) 
+    // })
