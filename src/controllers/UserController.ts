@@ -15,41 +15,31 @@ class UserController {
     try {
       await shema.validate(request.body, { abortEarly: false });
     } catch (error) {
-      return response.status(400).json({
-        error,
-        message: "Email Envalido!",
-      });
+      throw new AppError("Email Envalido!", error);
     }
 
-    try {
-      const usersRepository = getCustomRepository(UsersRepository);
+    const usersRepository = getCustomRepository(UsersRepository);
 
-      const userAlreadyExists = await usersRepository.findOne({
-        email,
-      });
-      if (userAlreadyExists) {
-        throw new AppError("user already exists!")
-      }
-
-      const user = usersRepository.create({
-        name,
-        email,
-      });
-
-      console.log(user);
-
-      await usersRepository.save(user);
-
-      return response.status(201).json({
-        message: "Cadastro com Sucesso",
-        user,
-      });
-    } catch (error) {
-      return response.json({
-        message: "Não possivel Reallizar operação",
-        error,
-      });
+    const userAlreadyExists = await usersRepository.findOne({
+      email,
+    });
+    if (userAlreadyExists) {
+      throw new AppError("user already exists!");
     }
+
+    const user = usersRepository.create({
+      name,
+      email,
+    });
+
+    console.log(user);
+
+    await usersRepository.save(user);
+
+    return response.status(201).json({
+      message: "Cadastro com Sucesso",
+      user,
+    });
   }
 }
 
